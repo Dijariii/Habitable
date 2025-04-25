@@ -1,0 +1,68 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:Habitable.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Habitable.Views.LoginView"
+             x:DataType="vm:LoginViewModel">
+    
+    <Grid RowDefinitions="Auto,*">
+        <TextBlock Text="Habitable"
+                 FontSize="32"
+                 FontWeight="Bold"
+                 HorizontalAlignment="Center"
+                 Margin="0,40,0,20"/>
+                 
+        <Border Grid.Row="1" 
+                Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                CornerRadius="8"
+                Padding="20"
+                MaxWidth="400"
+                MaxHeight="500"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center">
+            
+            <StackPanel Spacing="20">
+                <TextBox Text="{Binding Email}"
+                         Watermark="Email"
+                         UseFloatingWatermark="True"/>
+                
+                <TextBox Text="{Binding Password}"
+                         PasswordChar="•"
+                         Watermark="Password"
+                         UseFloatingWatermark="True"/>
+                
+                <TextBox Text="{Binding DisplayName}"
+                         Watermark="Display Name"
+                         UseFloatingWatermark="True"
+                         IsVisible="{Binding IsSigningUp}"/>
+                
+                <Button Content="{Binding ActionButtonText}"
+                        Command="{Binding SubmitCommand}"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center"/>
+                
+                <Button Content="Sign in with Google"
+                        Command="{Binding GoogleSignInCommand}"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center"
+                        Classes="outline"/>
+                
+                <TextBlock>
+                    <Run Text="{Binding ToggleActionText}"/>
+                    <Run Text=" "/>
+                    <TextBlock Text="{Binding ToggleLinkText}"
+                             Foreground="{DynamicResource SystemAccentColor}"
+                             TextDecorations="Underline"
+                             PointerPressed="OnToggleAuthMode"/>
+                </TextBlock>
+                
+                <TextBlock Text="{Binding ErrorMessage}"
+                          Foreground="Red"
+                          IsVisible="{Binding HasError}"
+                          TextWrapping="Wrap"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

@@ -1,0 +1,59 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Habitable.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="Habitable.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="Habitable">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Navigation Sidebar -->
+        <Border Grid.Column="0" 
+                Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                BorderThickness="0,0,1,0">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Top" Spacing="10" Margin="10">
+                    <Image Source="/Assets/avalonia-logo.ico" Width="32" Height="32" />
+                    <TextBlock Text="Habitable" 
+                             FontSize="24" 
+                             FontWeight="Bold" />
+                </StackPanel>
+                
+                <ListBox DockPanel.Dock="Top" 
+                         Margin="0,20,0,0"
+                         SelectedItem="{Binding SelectedNavItem}">
+                    <ListBoxItem Content="Dashboard" Tag="Dashboard" />
+                    <ListBoxItem Content="My Habits" Tag="Habits" />
+                    <ListBoxItem Content="Achievements" Tag="Achievements" />
+                    <ListBoxItem Content="Settings" Tag="Settings" />
+                </ListBox>
+                
+                <StackPanel DockPanel.Dock="Bottom" 
+                          Margin="10"
+                          VerticalAlignment="Bottom">
+                    <Button Content="Sign Out"
+                            Command="{Binding SignOutCommand}"
+                            HorizontalAlignment="Stretch" />
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- Content Area -->
+        <ContentControl Grid.Column="1" 
+                       Content="{Binding CurrentView}"
+                       Margin="20" />
+    </Grid>
+</Window>
