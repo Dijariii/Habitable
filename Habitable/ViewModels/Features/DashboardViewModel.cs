@@ -14,7 +14,7 @@ public partial class DashboardViewModel : ViewModelBase
     private readonly IAchievementService _achievementService;
 
     [ObservableProperty]
-    private ObservableCollection<Habit> todaysHabits = new();
+    private ObservableCollection<HabitViewModel> todaysHabits = new();
 
     [ObservableProperty]
     private int completedToday;
@@ -28,6 +28,9 @@ public partial class DashboardViewModel : ViewModelBase
     [ObservableProperty]
     private ObservableCollection<Achievement> recentAchievements = new();
 
+    [ObservableProperty]
+    private bool isLoading;
+
     public DashboardViewModel(IHabitService habitService, IAchievementService achievementService)
     {
         _habitService = habitService;
@@ -37,24 +40,53 @@ public partial class DashboardViewModel : ViewModelBase
 
     private async Task LoadDashboardDataAsync()
     {
+        IsLoading = true;
+
         var habits = await _habitService.GetHabitsAsync();
         var streaks = await _habitService.GetAllStreaksAsync();
         var achievements = await _achievementService.GetUnlockedAchievementsAsync();
 
         TodaysHabits.Clear();
-        foreach (var habit in habits)
+        foreach (var habit in habits.Where(h => ShouldShowHabitToday(h)))
         {
-            // TODO: Filter habits for today based on frequency
-            TodaysHabits.Add(habit);
+            var habitVm = new HabitViewModel(habit, _habitService, _achievementService);
+            habitVm.PropertyChanged += (s, e) => 
+            {
+                if (e.PropertyName == nameof(HabitViewModel.IsCompleted))
+                {
+                    UpdateStats();
+                }
+            };
+            TodaysHabits.Add(habitVm);
         }
 
-        TotalHabits = habits.Count;
+        UpdateStats();
         CurrentStreak = streaks.Count > 0 ? streaks.Values.Max() : 0;
 
         RecentAchievements.Clear();
-        foreach (var achievement in achievements.Take(5))
+        foreach (var achievement in achievements.OrderByDescending(a => a.UnlockedAt).Take(5))
         {
             RecentAchievements.Add(achievement);
         }
+
+        IsLoading = false;
+    }
+
+    private void UpdateStats()
+    {
+        TotalHabits = TodaysHabits.Count;
+        CompletedToday = TodaysHabits.Count(h => h.IsCompleted);
+    }
+
+    private bool ShouldShowHabitToday(Habit habit)
+    {
+        var today = DateTime.Now.DayOfWeek;
+        return habit.Frequency switch
+        {
+            Habit.FrequencyType.Daily => true,
+            Habit.FrequencyType.Weekly => today == DayOfWeek.Monday,
+            Habit.FrequencyType.Custom => habit.CustomDays.Contains(today),
+            _ => false
+        };
     }
 }

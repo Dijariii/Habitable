@@ -7,53 +7,134 @@
         x:Class="Habitable.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
-        Title="Habitable">
+        Title="Habitable"
+        TransparencyLevelHint="AcrylicBlur"
+        Background="Transparent"
+        ExtendClientAreaToDecorationsHint="True">
 
-    <Design.DataContext>
-        <vm:MainWindowViewModel/>
-    </Design.DataContext>
+    <Panel>
+        <ExperimentalAcrylicBorder IsHitTestVisible="False">
+            <ExperimentalAcrylicBorder.Material>
+                <ExperimentalAcrylicMaterial
+                    BackgroundSource="Digger"
+                    TintColor="{DynamicResource SystemAltHighColor}"
+                    TintOpacity="1"
+                    MaterialOpacity="0.65" />
+            </ExperimentalAcrylicBorder.Material>
+        </ExperimentalAcrylicBorder>
 
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="250" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
+        <Grid Margin="0,30,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="250" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-        <!-- Navigation Sidebar -->
-        <Border Grid.Column="0" 
-                Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
-                BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
-                BorderThickness="0,0,1,0">
-            <DockPanel>
-                <StackPanel DockPanel.Dock="Top" Spacing="10" Margin="10">
-                    <Image Source="/Assets/avalonia-logo.ico" Width="32" Height="32" />
-                    <TextBlock Text="Habitable" 
-                             FontSize="24" 
-                             FontWeight="Bold" />
-                </StackPanel>
-                
-                <ListBox DockPanel.Dock="Top" 
-                         Margin="0,20,0,0"
-                         SelectedItem="{Binding SelectedNavItem}">
-                    <ListBoxItem Content="Dashboard" Tag="Dashboard" />
-                    <ListBoxItem Content="My Habits" Tag="Habits" />
-                    <ListBoxItem Content="Achievements" Tag="Achievements" />
-                    <ListBoxItem Content="Settings" Tag="Settings" />
-                </ListBox>
-                
-                <StackPanel DockPanel.Dock="Bottom" 
-                          Margin="10"
-                          VerticalAlignment="Bottom">
-                    <Button Content="Sign Out"
-                            Command="{Binding SignOutCommand}"
-                            HorizontalAlignment="Stretch" />
-                </StackPanel>
-            </DockPanel>
-        </Border>
+            <!-- Navigation Sidebar -->
+            <Border Grid.Column="0" 
+                    Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                    BorderThickness="0,0,1,0">
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Top" Spacing="15" Margin="20">
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <Image Source="/Assets/avalonia-logo.ico" Width="32" Height="32" />
+                            <TextBlock Text="Habitable" 
+                                     FontSize="24" 
+                                     FontWeight="Bold"
+                                     VerticalAlignment="Center"/>
+                        </StackPanel>
+                        
+                        <TextBlock Text="habit tracker"
+                                 Opacity="0.7"
+                                 Margin="44,0,0,0"/>
+                    </StackPanel>
+                    
+                    <ListBox DockPanel.Dock="Top" 
+                             Margin="10,20"
+                             SelectedItem="{Binding SelectedNavItem}"
+                             Background="Transparent">
+                        <ListBox.Styles>
+                            <Style Selector="ListBoxItem">
+                                <Setter Property="Padding" Value="12,8"/>
+                                <Setter Property="CornerRadius" Value="8"/>
+                                <Setter Property="Margin" Value="0,2"/>
+                            </Style>
+                        </ListBox.Styles>
+                        
+                        <ListBoxItem Content="Dashboard">
+                            <ListBoxItem.ContentTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" Spacing="12">
+                                        <TextBlock Text="📊" FontSize="18"/>
+                                        <TextBlock Text="{Binding}" 
+                                                 VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBoxItem.ContentTemplate>
+                        </ListBoxItem>
+                        
+                        <ListBoxItem Content="My Habits">
+                            <ListBoxItem.ContentTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" Spacing="12">
+                                        <TextBlock Text="✅" FontSize="18"/>
+                                        <TextBlock Text="{Binding}"
+                                                 VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBoxItem.ContentTemplate>
+                        </ListBoxItem>
+                        
+                        <ListBoxItem Content="Achievements">
+                            <ListBoxItem.ContentTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" Spacing="12">
+                                        <TextBlock Text="🏆" FontSize="18"/>
+                                        <TextBlock Text="{Binding}"
+                                                 VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBoxItem.ContentTemplate>
+                        </ListBoxItem>
+                        
+                        <ListBoxItem Content="Settings">
+                            <ListBoxItem.ContentTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" Spacing="12">
+                                        <TextBlock Text="⚙️" FontSize="18"/>
+                                        <TextBlock Text="{Binding}"
+                                                 VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBoxItem.ContentTemplate>
+                        </ListBoxItem>
+                    </ListBox>
+                    
+                    <StackPanel DockPanel.Dock="Bottom" 
+                              Margin="20"
+                              VerticalAlignment="Bottom">
+                        <Button Content="Sign Out"
+                                Command="{Binding SignOutCommand}"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Center"
+                                Classes="accent">
+                            <Button.ContentTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="🚪" FontSize="16"/>
+                                        <TextBlock Text="{Binding}"
+                                                 VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </Button.ContentTemplate>
+                        </Button>
+                    </StackPanel>
+                </DockPanel>
+            </Border>
 
-        <!-- Content Area -->
-        <ContentControl Grid.Column="1" 
-                       Content="{Binding CurrentView}"
-                       Margin="20" />
-    </Grid>
+            <!-- Content Area -->
+            <ContentControl Grid.Column="1" 
+                           Content="{Binding CurrentView}"/>
+        </Grid>
+    </Panel>
 </Window>

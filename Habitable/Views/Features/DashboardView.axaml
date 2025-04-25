@@ -1,0 +1,189 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:Habitable.ViewModels.Features"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Habitable.Views.Features.DashboardView"
+             x:DataType="vm:DashboardViewModel"
+             Name="root">
+
+    <Grid RowDefinitions="Auto,*">
+        <Panel>
+            <TextBlock Text="Dashboard"
+                      FontSize="32"
+                      FontWeight="Bold"
+                      Margin="20,20,20,10"/>
+            <ProgressBar IsIndeterminate="True"
+                        IsVisible="{Binding IsLoading}"
+                        VerticalAlignment="Bottom"
+                        Height="2"/>
+        </Panel>
+
+        <ScrollViewer Grid.Row="1">
+            <Grid RowDefinitions="Auto,Auto,*" ColumnDefinitions="*,*" Margin="20,0">
+                <!-- Today's Stats -->
+                <Border Grid.Row="0" Grid.Column="0"
+                        Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                        CornerRadius="12"
+                        Padding="20"
+                        Margin="0,0,10,10"
+                        BoxShadow="0 2 8 0 #40000000">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,0,10">
+                            <TextBlock Text="📊"
+                                     FontSize="20"
+                                     VerticalAlignment="Center"/>
+                            <TextBlock Text="Today's Progress"
+                                     FontSize="18"
+                                     FontWeight="SemiBold"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="20">
+                            <StackPanel>
+                                <TextBlock Text="{Binding CompletedToday}"
+                                         FontSize="32"
+                                         FontWeight="Bold"
+                                         Foreground="{DynamicResource SystemAccentColor}"/>
+                                <TextBlock Text="Completed"
+                                         Opacity="0.7"/>
+                            </StackPanel>
+                            <StackPanel>
+                                <TextBlock Text="{Binding TotalHabits}"
+                                         FontSize="32"
+                                         FontWeight="Bold"/>
+                                <TextBlock Text="Total"
+                                         Opacity="0.7"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Current Streak -->
+                <Border Grid.Row="0" Grid.Column="1"
+                        Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                        CornerRadius="12"
+                        Padding="20"
+                        Margin="10,0,0,10"
+                        BoxShadow="0 2 8 0 #40000000">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,0,10">
+                            <TextBlock Text="🔥"
+                                     FontSize="20"
+                                     VerticalAlignment="Center"/>
+                            <TextBlock Text="Current Streak"
+                                     FontSize="18"
+                                     FontWeight="SemiBold"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <TextBlock Text="{Binding CurrentStreak}"
+                                     FontSize="32"
+                                     FontWeight="Bold"
+                                     Foreground="#FF5722"/>
+                            <TextBlock Text="days"
+                                     VerticalAlignment="Bottom"
+                                     Margin="0,0,0,5"
+                                     Opacity="0.7"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Today's Habits -->
+                <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                        Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                        CornerRadius="12"
+                        Padding="20"
+                        Margin="0,10"
+                        BoxShadow="0 2 8 0 #40000000">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,0,15">
+                            <TextBlock Text="✅"
+                                     FontSize="20"
+                                     VerticalAlignment="Center"/>
+                            <TextBlock Text="Today's Habits"
+                                     FontSize="18"
+                                     FontWeight="SemiBold"/>
+                        </StackPanel>
+                        <ItemsControl ItemsSource="{Binding TodaysHabits}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="{DynamicResource SystemControlBackgroundAltMediumBrush}"
+                                            CornerRadius="8"
+                                            Padding="15"
+                                            Margin="0,0,0,8"
+                                            BoxShadow="0 1 4 0 #20000000">
+                                        <Grid ColumnDefinitions="Auto,*,Auto">
+                                            <TextBlock Text="{Binding Icon, TargetNullValue='⭐'}"
+                                                     FontSize="24"
+                                                     VerticalAlignment="Center"
+                                                     Margin="0,0,15,0"/>
+                                            <StackPanel Grid.Column="1" Spacing="4">
+                                                <TextBlock Text="{Binding Name}"
+                                                         FontWeight="SemiBold"/>
+                                                <TextBlock Text="{Binding Description}"
+                                                         Opacity="0.7"
+                                                         TextWrapping="Wrap"/>
+                                            </StackPanel>
+                                            <CheckBox Grid.Column="2"
+                                                    IsChecked="{Binding IsCompleted}"
+                                                    Command="{Binding ToggleCompleteCommand}"
+                                                    VerticalAlignment="Center"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+                <!-- Recent Achievements -->
+                <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                        Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                        CornerRadius="12"
+                        Padding="20"
+                        Margin="0,10,0,20"
+                        BoxShadow="0 2 8 0 #40000000">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,0,15">
+                            <TextBlock Text="🏆"
+                                     FontSize="20"
+                                     VerticalAlignment="Center"/>
+                            <TextBlock Text="Recent Achievements"
+                                     FontSize="18"
+                                     FontWeight="SemiBold"/>
+                        </StackPanel>
+                        <ItemsControl ItemsSource="{Binding RecentAchievements}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="{DynamicResource SystemControlBackgroundAltMediumBrush}"
+                                            CornerRadius="8"
+                                            Padding="15"
+                                            Margin="0,0,0,8"
+                                            BoxShadow="0 1 4 0 #20000000">
+                                        <Grid ColumnDefinitions="Auto,*,Auto">
+                                            <TextBlock Text="{Binding Icon, TargetNullValue='🎯'}"
+                                                     FontSize="24"
+                                                     VerticalAlignment="Center"
+                                                     Margin="0,0,15,0"/>
+                                            <StackPanel Grid.Column="1" Spacing="4">
+                                                <TextBlock Text="{Binding Name}"
+                                                         FontWeight="SemiBold"/>
+                                                <TextBlock Text="{Binding Description}"
+                                                         Opacity="0.7"
+                                                         TextWrapping="Wrap"/>
+                                            </StackPanel>
+                                            <TextBlock Grid.Column="2"
+                                                     Text="{Binding UnlockedAt, StringFormat='{}{0:MMM d}'}"
+                                                     VerticalAlignment="Center"
+                                                     Opacity="0.7"
+                                                     Margin="15,0,0,0"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

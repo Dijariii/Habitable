@@ -6,63 +6,136 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Habitable.Views.LoginView"
              x:DataType="vm:LoginViewModel">
+
+    <UserControl.Styles>
+        <Style Selector="TextBox">
+            <Setter Property="Margin" Value="0,5"/>
+            <Setter Property="CornerRadius" Value="8"/>
+        </Style>
+        <Style Selector="Button">
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="16,12"/>
+            <Setter Property="Margin" Value="0,5"/>
+        </Style>
+    </UserControl.Styles>
     
-    <Grid RowDefinitions="Auto,*">
-        <TextBlock Text="Habitable"
-                 FontSize="32"
-                 FontWeight="Bold"
-                 HorizontalAlignment="Center"
-                 Margin="0,40,0,20"/>
-                 
-        <Border Grid.Row="1" 
-                Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
-                CornerRadius="8"
-                Padding="20"
-                MaxWidth="400"
-                MaxHeight="500"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center">
-            
-            <StackPanel Spacing="20">
-                <TextBox Text="{Binding Email}"
-                         Watermark="Email"
-                         UseFloatingWatermark="True"/>
-                
-                <TextBox Text="{Binding Password}"
-                         PasswordChar="•"
-                         Watermark="Password"
-                         UseFloatingWatermark="True"/>
-                
-                <TextBox Text="{Binding DisplayName}"
-                         Watermark="Display Name"
-                         UseFloatingWatermark="True"
-                         IsVisible="{Binding IsSigningUp}"/>
-                
-                <Button Content="{Binding ActionButtonText}"
-                        Command="{Binding SubmitCommand}"
-                        HorizontalAlignment="Stretch"
-                        HorizontalContentAlignment="Center"/>
-                
-                <Button Content="Sign in with Google"
-                        Command="{Binding GoogleSignInCommand}"
-                        HorizontalAlignment="Stretch"
-                        HorizontalContentAlignment="Center"
-                        Classes="outline"/>
-                
-                <TextBlock>
-                    <Run Text="{Binding ToggleActionText}"/>
-                    <Run Text=" "/>
-                    <TextBlock Text="{Binding ToggleLinkText}"
-                             Foreground="{DynamicResource SystemAccentColor}"
-                             TextDecorations="Underline"
-                             PointerPressed="OnToggleAuthMode"/>
-                </TextBlock>
-                
-                <TextBlock Text="{Binding ErrorMessage}"
-                          Foreground="Red"
-                          IsVisible="{Binding HasError}"
-                          TextWrapping="Wrap"/>
+    <Panel>
+        <ExperimentalAcrylicBorder IsHitTestVisible="False">
+            <ExperimentalAcrylicBorder.Material>
+                <ExperimentalAcrylicMaterial
+                    BackgroundSource="Digger"
+                    TintColor="{DynamicResource SystemAltHighColor}"
+                    TintOpacity="1"
+                    MaterialOpacity="0.65" />
+            </ExperimentalAcrylicBorder.Material>
+        </ExperimentalAcrylicBorder>
+
+        <Grid RowDefinitions="Auto,*">
+            <StackPanel Margin="0,60,0,0">
+                <StackPanel Orientation="Horizontal" 
+                          HorizontalAlignment="Center" 
+                          Spacing="15">
+                    <Image Source="/Assets/avalonia-logo.ico" 
+                           Width="48" 
+                           Height="48" />
+                    <TextBlock Text="Habitable"
+                             FontSize="42"
+                             FontWeight="Bold"
+                             VerticalAlignment="Center"/>
+                </StackPanel>
+                <TextBlock Text="build better habits, one day at a time"
+                         FontSize="16"
+                         Opacity="0.7"
+                         HorizontalAlignment="Center"
+                         Margin="0,10,0,0"/>
             </StackPanel>
-        </Border>
-    </Grid>
+                 
+            <Border Grid.Row="1" 
+                    Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                    CornerRadius="20"
+                    Padding="30"
+                    BoxShadow="0 8 32 0 #40000000"
+                    MaxWidth="400"
+                    MaxHeight="500"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Margin="20">
+                
+                <StackPanel Spacing="15">
+                    <TextBox Text="{Binding Email}"
+                             Watermark="Email"
+                             UseFloatingWatermark="True">
+                        <TextBox.InnerLeftContent>
+                            <TextBlock Text="📧" 
+                                     FontSize="16" 
+                                     VerticalAlignment="Center"
+                                     Margin="10,0"/>
+                        </TextBox.InnerLeftContent>
+                    </TextBox>
+                    
+                    <TextBox Text="{Binding Password}"
+                             PasswordChar="•"
+                             Watermark="Password"
+                             UseFloatingWatermark="True">
+                        <TextBox.InnerLeftContent>
+                            <TextBlock Text="🔒" 
+                                     FontSize="16" 
+                                     VerticalAlignment="Center"
+                                     Margin="10,0"/>
+                        </TextBox.InnerLeftContent>
+                    </TextBox>
+                    
+                    <TextBox Text="{Binding DisplayName}"
+                             Watermark="Display Name"
+                             UseFloatingWatermark="True"
+                             IsVisible="{Binding IsSigningUp}">
+                        <TextBox.InnerLeftContent>
+                            <TextBlock Text="👤" 
+                                     FontSize="16" 
+                                     VerticalAlignment="Center"
+                                     Margin="10,0"/>
+                        </TextBox.InnerLeftContent>
+                    </TextBox>
+                    
+                    <Button Content="{Binding ActionButtonText}"
+                            Command="{Binding SubmitCommand}"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Center"
+                            Classes="accent"/>
+                    
+                    <Button Content="Sign in with Google"
+                            Command="{Binding GoogleSignInCommand}"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Center">
+                        <Button.ContentTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="🌐" FontSize="16"/>
+                                    <TextBlock Text="{Binding}"
+                                             VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </Button.ContentTemplate>
+                    </Button>
+                    
+                    <StackPanel Orientation="Horizontal" 
+                              HorizontalAlignment="Center" 
+                              Spacing="5">
+                        <TextBlock Text="{Binding ToggleActionText}"/>
+                        <TextBlock Text="{Binding ToggleLinkText}"
+                                 Foreground="{DynamicResource SystemAccentColor}"
+                                 TextDecorations="Underline"
+                                 Cursor="Hand"
+                                 PointerPressed="OnToggleAuthMode"/>
+                    </StackPanel>
+                    
+                    <TextBlock Text="{Binding ErrorMessage}"
+                             Foreground="Red"
+                             IsVisible="{Binding HasError}"
+                             TextWrapping="Wrap"
+                             HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Panel>
 </UserControl>

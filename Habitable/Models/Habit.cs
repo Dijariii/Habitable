@@ -19,6 +19,7 @@ public partial class Habit : BaseModel
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public int CurrentStreak { get; set; }
     public int LongestStreak { get; set; }
+    public bool IsCompleted { get; set; }
 
     public enum FrequencyType
     {
