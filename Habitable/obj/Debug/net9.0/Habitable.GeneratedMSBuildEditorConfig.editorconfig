@@ -24,6 +24,9 @@ build_property.EnableCodeStyleSeverity =
 [/home/dijari/Habitable/Habitable/App.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
+[/home/dijari/Habitable/Habitable/Views/AchievementsView.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
 [/home/dijari/Habitable/Habitable/Views/LoginView.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 

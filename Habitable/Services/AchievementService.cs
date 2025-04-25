@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Supabase;
 using Habitable.Models;
@@ -23,7 +24,8 @@ public class AchievementService : IAchievementService
         {
             if (await _syncService.IsOnlineAsync())
             {
-                return await _supabaseClient.From<Achievement>().Get();
+                var response = await _supabaseClient.From<Achievement>().Get();
+                return response.Models;
             }
             return new List<Achievement>();
         }
@@ -39,9 +41,10 @@ public class AchievementService : IAchievementService
         {
             if (await _syncService.IsOnlineAsync())
             {
-                return await _supabaseClient.From<Achievement>()
+                var response = await _supabaseClient.From<Achievement>()
                     .Where(a => a.UnlockedAt != null)
                     .Get();
+                return response.Models;
             }
             return new List<Achievement>();
         }
@@ -55,27 +58,31 @@ public class AchievementService : IAchievementService
     {
         try
         {
-            var achievement = await _supabaseClient.From<Achievement>()
+            var achievements = await _supabaseClient.From<Achievement>()
                 .Where(a => a.Id == achievementId)
-                .Single();
+                .Get();
 
-            achievement.UnlockedAt = DateTime.UtcNow;
-            
-            if (await _syncService.IsOnlineAsync())
+            var achievement = achievements.Models.FirstOrDefault();
+            if (achievement != null)
             {
-                return await _supabaseClient.From<Achievement>()
-                    .Update(achievement)
-                    .Match(new { Id = achievementId })
-                    .Single();
-            }
+                achievement.UnlockedAt = DateTime.UtcNow;
+                
+                if (await _syncService.IsOnlineAsync())
+                {
+                    var response = await _supabaseClient.From<Achievement>()
+                        .Where(a => a.Id == achievementId)
+                        .Update(achievement);
+                    return response.Models.FirstOrDefault() ?? achievement;
+                }
 
-            await _syncService.QueueOfflineChangesAsync(new OfflineChange(
-                "Achievement",
-                achievementId,
-                ChangeType.Update,
-                System.Text.Json.JsonSerializer.Serialize(achievement)
-            ));
-            return achievement;
+                await _syncService.QueueOfflineChangesAsync(new OfflineChange(
+                    "Achievement",
+                    achievementId,
+                    ChangeType.Update,
+                    System.Text.Json.JsonSerializer.Serialize(achievement)
+                ));
+            }
+            return achievement ?? new Achievement { Id = achievementId };
         }
         catch (Exception)
         {
@@ -87,10 +94,10 @@ public class AchievementService : IAchievementService
     {
         try
         {
-            var achievement = await _supabaseClient.From<Achievement>()
+            var achievements = await _supabaseClient.From<Achievement>()
                 .Where(a => a.Id == achievementId)
-                .Single();
-            return achievement.Progress;
+                .Get();
+            return achievements.Models.FirstOrDefault()?.Progress ?? 0;
         }
         catch (Exception)
         {
@@ -102,10 +109,11 @@ public class AchievementService : IAchievementService
     {
         try
         {
-            // Demo implementation - just check streak-based achievements
-            var habit = await _supabaseClient.From<Habit>()
+            var habits = await _supabaseClient.From<Habit>()
                 .Where(h => h.Id == habitId)
-                .Single();
+                .Get();
+            var habit = habits.Models.FirstOrDefault();
+            if (habit == null) return;
 
             var achievements = await GetAllAchievementsAsync();
             foreach (var achievement in achievements)
@@ -132,9 +140,10 @@ public class AchievementService : IAchievementService
         {
             if (await _syncService.IsOnlineAsync())
             {
-                return await _supabaseClient.From<Achievement>()
+                var response = await _supabaseClient.From<Achievement>()
                     .Where(a => a.UnlockedAt == null)
                     .Get();
+                return response.Models;
             }
             return new List<Achievement>();
         }

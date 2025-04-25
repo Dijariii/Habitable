@@ -1,43 +1,24 @@
 using System;
 using System.Collections.Generic;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Supabase.Postgrest.Models;
 
 namespace Habitable.Models;
 
-public partial class Habit : ObservableObject
+[ObservableObject]
+public partial class Habit : BaseModel
 {
-    [ObservableProperty]
-    private string id;
-
-    [ObservableProperty]
-    private string name;
-
-    [ObservableProperty]
-    private string description;
-
-    [ObservableProperty]
-    private string icon;
-
-    [ObservableProperty]
-    private string color;
-
-    [ObservableProperty]
-    private FrequencyType frequency;
-
-    [ObservableProperty]
-    private List<DayOfWeek> customDays;
-
-    [ObservableProperty]
-    private TimeSpan? reminderTime;
-
-    [ObservableProperty]
-    private DateTime createdAt;
-
-    [ObservableProperty]
-    private int currentStreak;
-
-    [ObservableProperty]
-    private int longestStreak;
+    public string Id { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public string Icon { get; set; } = string.Empty;
+    public string Color { get; set; } = string.Empty;
+    public FrequencyType Frequency { get; set; }
+    public List<DayOfWeek> CustomDays { get; set; } = new();
+    public TimeSpan? ReminderTime { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public int CurrentStreak { get; set; }
+    public int LongestStreak { get; set; }
 
     public enum FrequencyType
     {

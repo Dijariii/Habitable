@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Supabase;
 using Habitable.Models;
@@ -23,9 +24,10 @@ public class HabitService : IHabitService
         {
             if (await _syncService.IsOnlineAsync())
             {
-                return await _supabaseClient.From<Habit>().Get();
+                var response = await _supabaseClient.From<Habit>().Get();
+                return response.Models;
             }
-            return new List<Habit>(); // TODO: Implement local storage retrieval
+            return new List<Habit>();
         }
         catch (Exception)
         {
@@ -39,7 +41,8 @@ public class HabitService : IHabitService
         {
             if (await _syncService.IsOnlineAsync())
             {
-                return await _supabaseClient.From<Habit>().Insert(habit).Single();
+                var response = await _supabaseClient.From<Habit>().Insert(habit);
+                return response.Models.FirstOrDefault() ?? habit;
             }
             
             await _syncService.QueueOfflineChangesAsync(new OfflineChange(
@@ -62,10 +65,10 @@ public class HabitService : IHabitService
         {
             if (await _syncService.IsOnlineAsync())
             {
-                return await _supabaseClient.From<Habit>()
-                    .Update(habit)
-                    .Match(new { Id = habit.Id })
-                    .Single();
+                var response = await _supabaseClient.From<Habit>()
+                    .Where(h => h.Id == habit.Id)
+                    .Update(habit);
+                return response.Models.FirstOrDefault() ?? habit;
             }
 
             await _syncService.QueueOfflineChangesAsync(new OfflineChange(
@@ -89,8 +92,8 @@ public class HabitService : IHabitService
             if (await _syncService.IsOnlineAsync())
             {
                 await _supabaseClient.From<Habit>()
-                    .Delete()
-                    .Match(new { Id = habitId });
+                    .Where(h => h.Id == habitId)
+                    .Delete();
                 return;
             }
 
@@ -111,10 +114,12 @@ public class HabitService : IHabitService
     {
         try
         {
-            // For demo purposes, just update the streak
-            var habit = await _supabaseClient.From<Habit>()
+            var habits = await _supabaseClient.From<Habit>()
                 .Where(h => h.Id == habitId)
-                .Single();
+                .Get();
+            
+            var habit = habits.Models.FirstOrDefault();
+            if (habit == null) return false;
 
             habit.CurrentStreak++;
             if (habit.CurrentStreak > habit.LongestStreak)
@@ -141,10 +146,10 @@ public class HabitService : IHabitService
     {
         try
         {
-            var habit = await _supabaseClient.From<Habit>()
+            var habits = await _supabaseClient.From<Habit>()
                 .Where(h => h.Id == habitId)
-                .Single();
-            return habit.CurrentStreak;
+                .Get();
+            return habits.Models.FirstOrDefault()?.CurrentStreak ?? 0;
         }
         catch (Exception)
         {
@@ -157,12 +162,7 @@ public class HabitService : IHabitService
         try
         {
             var habits = await GetHabitsAsync();
-            var streaks = new Dictionary<string, int>();
-            foreach (var habit in habits)
-            {
-                streaks[habit.Id] = habit.CurrentStreak;
-            }
-            return streaks;
+            return habits.ToDictionary(h => h.Id, h => h.CurrentStreak);
         }
         catch (Exception)
         {

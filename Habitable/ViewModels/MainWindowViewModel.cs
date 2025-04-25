@@ -3,12 +3,15 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Habitable.Services;
+using Habitable.ViewModels.Features;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Habitable.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
     private readonly IAuthService _authService;
+    private readonly IServiceProvider _serviceProvider;
     
     [ObservableProperty]
     private ViewModelBase? currentView;
@@ -16,9 +19,10 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     private string selectedNavItem = "Dashboard";
 
-    public MainWindowViewModel(IAuthService authService)
+    public MainWindowViewModel(IAuthService authService, IServiceProvider serviceProvider)
     {
         _authService = authService;
+        _serviceProvider = serviceProvider;
         UpdateCurrentView();
     }
 
@@ -31,10 +35,10 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         CurrentView = SelectedNavItem switch
         {
-            "Dashboard" => new DashboardViewModel(),
-            "Habits" => new HabitsViewModel(),
-            "Achievements" => new AchievementsViewModel(),
-            "Settings" => new SettingsViewModel(),
+            "Dashboard" => _serviceProvider.GetRequiredService<DashboardViewModel>(),
+            "Habits" => _serviceProvider.GetRequiredService<HabitsViewModel>(),
+            "Achievements" => _serviceProvider.GetRequiredService<AchievementsViewModel>(),
+            "Settings" => _serviceProvider.GetRequiredService<SettingsViewModel>(),
             _ => throw new ArgumentException($"Unknown nav item: {SelectedNavItem}")
         };
     }
@@ -43,6 +47,6 @@ public partial class MainWindowViewModel : ViewModelBase
     private async Task SignOut()
     {
         await _authService.SignOutAsync();
-        // TODO: Navigate to login view
+        // Navigate to login view will be handled by AuthService state change
     }
 }

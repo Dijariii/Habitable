@@ -1,13 +1,15 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Data.Core;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
 using Habitable.Services;
 using Habitable.ViewModels;
+using Habitable.ViewModels.Features;
 using Habitable.Views;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Linq;
+using Supabase;
 
 namespace Habitable;
 
@@ -22,21 +24,28 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
-        // Remove any DataValidation plugins
-        ExpressionObserver.DataValidators.RemoveAll(x => x is DataAnnotationsValidationPlugin);
+        // Remove data validation plugins to avoid conflicts
+        if (BindingPlugins.DataValidators.Any(x => x is DataAnnotationsValidationPlugin))
+        {
+            var pluginsToRemove = BindingPlugins.DataValidators
+                .OfType<DataAnnotationsValidationPlugin>()
+                .ToList();
+            foreach (var plugin in pluginsToRemove)
+            {
+                BindingPlugins.DataValidators.Remove(plugin);
+            }
+        }
 
         ConfigureServices();
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             var authService = _serviceProvider!.GetRequiredService<IAuthService>();
-            var loginViewModel = _serviceProvider.GetRequiredService<LoginViewModel>();
-
+            var mainViewModel = _serviceProvider.GetRequiredService<MainWindowViewModel>();
+            
             desktop.MainWindow = new MainWindow
             {
-                DataContext = authService.IsAuthenticated().Result
-                    ? _serviceProvider.GetRequiredService<MainWindowViewModel>()
-                    : loginViewModel
+                DataContext = mainViewModel
             };
         }
 
@@ -47,15 +56,26 @@ public partial class App : Application
     {
         var services = new ServiceCollection();
 
-        // Configuration
-        const string supabaseUrl = "YOUR_SUPABASE_URL"; // TODO: Move to configuration
-        const string supabaseKey = "YOUR_SUPABASE_KEY"; // TODO: Move to configuration
+        // Configuration - Using demo project for development
+        const string supabaseUrl = "https://xyzcompany.supabase.co";  // Replace with your Supabase URL
+        const string supabaseKey = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."; // Replace with your Supabase anon key
+
+        // Create Supabase client
+        var supabaseOptions = new SupabaseOptions
+        {
+            AutoRefreshToken = true,
+            AutoConnectRealtime = true
+        };
+        var supabaseClient = new Client(supabaseUrl, supabaseKey, supabaseOptions);
 
         // Register services
-        services.AddSingleton<IAuthService>(new AuthService(supabaseUrl, supabaseKey));
+        services.AddSingleton(supabaseClient);
         services.AddSingleton<ISyncService, SyncService>();
-        services.AddSingleton<IHabitService, HabitService>();
-        services.AddSingleton<IAchievementService, AchievementService>();
+        services.AddSingleton<IAuthService>(provider => new AuthService(supabaseUrl, supabaseKey));
+        services.AddSingleton<IHabitService>(provider => 
+            new HabitService(supabaseClient, provider.GetRequiredService<ISyncService>()));
+        services.AddSingleton<IAchievementService>(provider => 
+            new AchievementService(supabaseClient, provider.GetRequiredService<ISyncService>()));
 
         // Register ViewModels
         services.AddTransient<LoginViewModel>();

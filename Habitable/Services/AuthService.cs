@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Supabase;
 using Habitable.Models;
@@ -68,7 +69,7 @@ public class AuthService : IAuthService
         try
         {
             var response = await _supabaseClient.Auth.SignUp(email, password);
-            if (response != null)
+            if (response?.User != null)
             {
                 var profile = new UserProfile
                 {
@@ -78,8 +79,8 @@ public class AuthService : IAuthService
                     CreatedAt = DateTime.UtcNow
                 };
 
-                await _supabaseClient.From<UserProfile>().Insert(profile);
-                _currentUser = profile;
+                var insertResponse = await _supabaseClient.From<UserProfile>().Insert(profile);
+                _currentUser = insertResponse.Models[0];
                 return true;
             }
             return false;
@@ -103,11 +104,11 @@ public class AuthService : IAuthService
     {
         try
         {
-            await _supabaseClient.From<UserProfile>()
-                .Update(profile)
-                .Match(new { Id = profile.Id })
-                .Single();
-            _currentUser = profile;
+            var response = await _supabaseClient.From<UserProfile>()
+                .Where(p => p.Id == profile.Id)
+                .Update(profile);
+                
+            _currentUser = response.Models[0];
             return true;
         }
         catch (Exception)
@@ -131,11 +132,12 @@ public class AuthService : IAuthService
     private async Task LoadUserProfile()
     {
         var session = await _supabaseClient.Auth.RetrieveSessionAsync();
-        if (session != null)
+        if (session?.User != null)
         {
-            _currentUser = await _supabaseClient.From<UserProfile>()
+            var response = await _supabaseClient.From<UserProfile>()
                 .Where(p => p.Id == session.User.Id)
-                .Single();
+                .Get();
+            _currentUser = response.Models.FirstOrDefault();
         }
     }
 }
